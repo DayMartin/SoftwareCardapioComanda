@@ -1,0 +1,30 @@
+################ COMANDAS
+
+### BUSCAR TODOS AS comandas
+
+GET http://localhost:3048/api/comanda/all
+
+### CADASTRAR Nova comanda
+
+POST http://localhost:3048/api/comanda/create
+Content-Type: application/json
+
+{
+  "cliente": "Doria",
+  "produtos": [1,2,4]
+}
+
+
+###
+
+DELETE http://localhost:3048/api/comanda/delete
+Content-Type: application/json
+
+{
+  "id": 1
+}
+
+###
+
+GET http://localhost:3048/api/comanda/id/2
+Content-Type: application/json

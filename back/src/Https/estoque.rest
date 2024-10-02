@@ -1,0 +1,32 @@
+### ESTOQUE
+
+### BUSCAR TODOS AS ESTOQUE
+GET http://localhost:3048/api/estoque/all
+
+### AO CADASTRAR UM ESTOQUE PELA PRIMEIRA VEZ, O VALOR DA QUANTIDADE PRECISA SER 0
+POST http://localhost:3048/api/estoque/create
+Content-Type: application/json
+
+{
+  "nome": "Carne com baicon",
+  "preco": 15
+}
+
+###
+
+POST http://localhost:3048/api/estoque/id
+Content-Type: application/json
+
+{
+  "id": 2
+}
+
+
+###
+DELETE http://localhost:3048/api/estoque/delete
+Content-Type: application/json
+
+{
+  "id": 1
+}
+
