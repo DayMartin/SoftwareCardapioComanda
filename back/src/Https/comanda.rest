@@ -37,7 +37,7 @@ Content-Type: application/json
   "comanda": 1,
   "produto": [
     {
-      "id": 1,
+      "id": 2,
       "quantidade" : 1,
       "tipo": "Adicionar"
     
@@ -62,6 +62,6 @@ Content-Type: application/json
 
 {
   "comanda": 1,
-  "produto": 1
+  "produto": 2
 
 }

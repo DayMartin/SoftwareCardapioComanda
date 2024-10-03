@@ -8,7 +8,7 @@ POST http://localhost:3048/api/estoque/create
 Content-Type: application/json
 
 {
-  "nome": "Carne com baicon",
+  "nome": "Carne",
   "preco": 15
 }
 

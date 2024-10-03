@@ -1,7 +1,5 @@
 import { Environment } from '../../../environment';
 import { Api } from '../axios-config';
-import { IDetalheHistoric } from '../Estoque/EstoqueService';
-
 
 // Interface para uma parcela de uma venda
 export interface IComanda {
@@ -72,11 +70,11 @@ const getByID = async (id: number): Promise<IComanda | Error> => {
 };
 
 
-const create = async (dados: IComanda): Promise<void | Error> => {
+const create = async (dados: ComandaCreate): Promise<void | Error> => {
 
   console.log('dados', dados)
   try {
-    await Api.post<IComanda>('comanda/create', dados);
+    await Api.post<ComandaCreate>('comanda/create', dados);
 
   } catch (error) {
     throw error;
