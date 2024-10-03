@@ -10,8 +10,7 @@ POST http://localhost:3048/api/comanda/create
 Content-Type: application/json
 
 {
-  "cliente": "Doria",
-  "produtos": [1,2,4]
+  "cliente": "Doria"
 }
 
 
@@ -26,5 +25,43 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3048/api/comanda/id/2
+GET http://localhost:3048/api/comanda/id/1
 Content-Type: application/json
+
+### 
+
+POST  http://localhost:3048/api/comanda/insertProduto
+Content-Type: application/json
+
+{
+  "comanda": 1,
+  "produto": [
+    {
+      "id": 1,
+      "quantidade" : 1,
+      "tipo": "Adicionar"
+    
+    }
+
+  ]
+}
+
+
+###
+POST http://localhost:3048/api/comanda/consultProduto
+Content-Type: application/json
+
+{
+  "comanda": 1
+
+}
+
+###
+DELETE http://localhost:3048/api/comanda/deletarProduto
+Content-Type: application/json
+
+{
+  "comanda": 1,
+  "produto": 1
+
+}

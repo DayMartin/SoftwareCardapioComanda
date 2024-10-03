@@ -36,8 +36,7 @@ const createTables = () => {
 
         db.run(`CREATE TABLE IF NOT EXISTS comanda (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cliente TEXT NOT NULL,
-            produtos TEXT NOT NULL
+            cliente TEXT NOT NULL
         )`, (err) => {
             if (err) {
                 console.error('Erro ao criar tabela comanda:', err.message);
@@ -46,6 +45,22 @@ const createTables = () => {
             }
         });
         
+
+        db.run(`CREATE TABLE IF NOT EXISTS produto_comanda (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            comanda INTEGER NOT NULL,
+            produto INTEGER NOT NULL,
+            quantidade INTEGER NOT NULL,
+            FOREIGN KEY (produto) REFERENCES produtos(id),
+            FOREIGN KEY (comanda) REFERENCES comanda(id)
+
+        )`, (err) => {
+            if (err) {
+                console.error('Erro ao criar tabela produto_comanda:', err.message);
+            } else {
+                console.log('Tabela produto_comanda criada ou já existe.');
+            }
+        });
     });
 };
 
