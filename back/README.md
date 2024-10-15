@@ -3,7 +3,7 @@
  <img width=200px height=200px src="https://i.imgur.com/6wj0hh6.jpg" alt="Project logo"></a>
 </p>
 
-<h3 align="center">Project Title</h3>
+<h3 align="center">OrdersFoods</h3>
 
 <div align="center">
 
@@ -16,7 +16,7 @@
 
 ---
 
-<p align="center"> Few lines describing your project.
+<p align="center">Projeto para abertura de comandas e cadastro de produtos
     <br> 
 </p>
 
@@ -34,7 +34,7 @@
 
 ## 🧐 About <a name = "about"></a>
 
-Write about 1-2 paragraphs describing the purpose of your project.
+Projeto para abertura de comandas e cadastro de produtos
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
@@ -42,26 +42,53 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them.
+Certifique-se de ter nvm, node, npm instalados: 
+
+```bash 
+sudo apt update
+sudo apt install nodejs npm
+
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+source ~/.bashrc
+
+nvm --version
+
+nvm install v22.5.1
+
+nvm use v22.5.1
+```
+
+Certifique-se de que o comando dev no seu arquivo package.json esteja correto. O script deve se parecer com isso:
 
 ```
-Give examples
+"scripts": {
+  "dev": "nodemon --watch src --exec ts-node src/index.ts"
+}
+
 ```
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running.
+Instale o nomemon para ambiente de desenvolvimento
 
 Say what the step will be
 
-```
-Give the example
+``` bash
+npm install nodemon --save-dev
+
+npm install ts-node typescript --save-dev
+
 ```
 
-And repeat
+Start the app
 
-```
-until finished
+```bash
+  npm run dev
 ```
 
 End with an example of getting some data out of the system or using it for a little demo.
@@ -103,9 +130,9 @@ Add additional notes about how to deploy this on a live system.
 
 ## ✍️ Authors <a name = "authors"></a>
 
-- [@kylelobo](https://github.com/kylelobo) - Idea & Initial work
+- [@DayMartin](https://github.com/DayMartin) - Dinah Martins
 
-See also the list of [contributors](https://github.com/kylelobo/The-Documentation-Compendium/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/DayMartin/The-Documentation-Compendium/contributors) who participated in this project.
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
 
