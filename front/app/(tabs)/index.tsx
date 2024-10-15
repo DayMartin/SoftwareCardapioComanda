@@ -11,6 +11,7 @@ import { ThemedView } from "@/components/ThemedView";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
+  ComandaCreate,
   ComandaService,
   IApiResponse,
   IComanda,
@@ -97,7 +98,7 @@ const HomeScreen = () => {
 
   // Salvar novos produtos na comanda selecionada
   const salvarProdutos = async (dados: ComandaProduto_create) => {
-          console.log('dados enviados', dados)
+          // console.log('dados enviados', dados)
 
     try {
       const produtos = await ComandaProdutoService.insert(dados);
@@ -201,6 +202,21 @@ const HomeScreen = () => {
       </TouchableOpacity>
     </View>
   );
+
+  // Função para adicionar uma nova comanda
+  const newComanda = async(dados: ComandaCreate) => {
+     try {
+      const save = await ComandaService.create(dados)
+      if (save instanceof Error) {
+        console.error("Erro ao salvar uma nova comanda.");
+      } else {
+        console.log("Nova comanda criada com sucesso:", save);
+      }
+    } catch (error) {
+      console.error("Erro ao salvar uma nova comanda:", error);
+
+    }
+  }
 
   return (
     <ParallaxScrollView

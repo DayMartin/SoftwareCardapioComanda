@@ -10,7 +10,6 @@ export interface IComanda {
 
   export interface ComandaCreate {
     cliente: string;
-    produtos: string;
   }
 
 export interface IApiResponse {
