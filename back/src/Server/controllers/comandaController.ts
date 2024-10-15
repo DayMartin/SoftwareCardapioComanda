@@ -57,6 +57,8 @@ const comandaController = {
   createComanda: async (req: Request, res: Response): Promise<void> => {
     const { cliente } = req.body;
 
+    console.log('cliente', cliente)
+
     if (!cliente) {
       res.status(400).json({ error: "cliente é obrigatório" });
       return;

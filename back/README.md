@@ -42,6 +42,8 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
+Para desenvolvimento: 
+
 Certifique-se de ter nvm, node, npm instalados: 
 
 ```bash 
@@ -92,6 +94,24 @@ Start the app
 ```
 
 End with an example of getting some data out of the system or using it for a little demo.
+
+Para produção: 
+
+
+```bash
+  npm install --production
+
+  npm install typescript --save-dev
+
+  npm install --save-dev @types/multer
+
+  npm i --save-dev @types/module-alias
+
+  npm run build
+
+  npm start
+
+```
 
 ## 🔧 Running the tests <a name = "tests"></a>
 
