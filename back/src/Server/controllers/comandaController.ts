@@ -76,6 +76,7 @@ const comandaController = {
 
   insertProduto: async (req: Request, res: Response): Promise<void> => {
     const { comanda, produto } = req.body;
+    console.log('comanda', comanda, 'produto', produto)
 
     if (!comanda || !produto || !Array.isArray(produto)) {
         res.status(400).json({

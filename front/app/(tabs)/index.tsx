@@ -18,18 +18,25 @@ import {
 import {
   ComandaProdutoService,
   Integration,
-  ComandaProduto_listagem,
   Produto,
+  ComandaProduto_create,
 } from "@/services/api/Comanda/ComandaProdutoService";
+import {
+  EstoqueService,
+  IEstoque_view,
+  IApiResponseProdutos,
+} from "@/services/api/Estoque/EstoqueService";
 
 const HomeScreen = () => {
   const [comandas, setComanda] = useState<IApiResponse | null>(null);
-  const [produtosComanda, setprodutosComanda] = useState<Integration | null>(
-    null
-  );
+  const [produtosComanda, setprodutosComanda] = useState<Integration | null>(null);
   const [selectedComanda, setSelectedComanda] = useState<IComanda | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [produtos, setProdutos] = useState<IApiResponseProdutos | null>(null);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalProdutoVisible, setModalProdutoVisible] = useState(false);
+
+  // Consultar comandas disponíveis
   const consultarComanda = async () => {
     try {
       const dados = await ComandaService.getComandas();
@@ -43,6 +50,7 @@ const HomeScreen = () => {
     }
   };
 
+  // Consultar os produtos já adicionados à comanda selecionada
   const consultarComandaProduto = async () => {
     if (!selectedComanda?.id) {
       console.error("Nenhuma comanda selecionada para consultar os produtos.");
@@ -50,18 +58,57 @@ const HomeScreen = () => {
     }
 
     try {
-      const produtoDetalhes = await ComandaProdutoService.getByID(
-        selectedComanda.id
-      );
-
+      const produtoDetalhes = await ComandaProdutoService.getByID(selectedComanda.id);
       if (produtoDetalhes instanceof Error) {
         setprodutosComanda(null);
       } else {
         setprodutosComanda(produtoDetalhes);
-        console.log("produtoDetalhes", produtoDetalhes);
+
+        
+        produtoDetalhes.rows.forEach(async (dados) => {
+          const idProduto = dados.id
+          const consultarDetalheProduto = await EstoqueService.getByID(idProduto);
+          if (consultarDetalheProduto instanceof Error) {
+            console.log('error', Error)
+          } else {
+            console.log('foi', consultarDetalheProduto)
+          }
+
+        });
       }
     } catch (error) {
       console.error("Erro ao consultar os produtos da comanda:", error);
+    }
+  };
+
+  // Consultar todos os produtos disponíveis no estoque
+  const consultarProdutos = async () => {
+    try {
+      const produtos = await EstoqueService.getAllList();
+      if (produtos instanceof Error) {
+        setProdutos(null);
+      } else {
+        setProdutos(produtos);
+      }
+    } catch (error) {
+      console.error("Erro ao consultar os produtos da comanda:", error);
+    }
+  };
+
+  // Salvar novos produtos na comanda selecionada
+  const salvarProdutos = async (dados: ComandaProduto_create) => {
+          console.log('dados enviados', dados)
+
+    try {
+      const produtos = await ComandaProdutoService.insert(dados);
+      if (produtos instanceof Error) {
+        console.error("Erro ao salvar os produtos na comanda.");
+      } else {
+        console.log("Produtos salvos com sucesso:", produtos);
+      }
+    } catch (error) {
+      console.error("Erro ao salvar produtos da comanda:", error);
+
     }
   };
 
@@ -75,6 +122,12 @@ const HomeScreen = () => {
     }
   }, [selectedComanda]);
 
+  const abrirModalProdutos = () => {
+    consultarProdutos(); 
+    setModalProdutoVisible(true); 
+  };
+
+  // Função para renderizar a comanda
   const renderComanda = ({ item }: { item: IComanda }) => (
     <View style={styles.comandaItem}>
       <ThemedText type="default">ID: {item.id}</ThemedText>
@@ -82,8 +135,8 @@ const HomeScreen = () => {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          setSelectedComanda(item); // Seleciona a comanda
-          setModalVisible(true); // Abre o modal
+          setSelectedComanda(item);
+          setModalVisible(true);
         }}
       >
         <ThemedText type="default">Ver Detalhes</ThemedText>
@@ -91,81 +144,148 @@ const HomeScreen = () => {
     </View>
   );
 
-  const renderProduto = ({ item }: { item: Produto }) => {
-    return (
-      <View style={styles.productItem}>
-        <ThemedText>Produto ID: {item.id}</ThemedText>
-        <ThemedText>Quantidade: {item.quantidade}</ThemedText>
-      </View>
-    );
-  };
+  // Função para renderizar produtos da comanda
+  const renderProduto = ({ item }: { item: Produto }) => (
+    <View style={styles.productItem}>
+      <ThemedText>Produto ID: {item.id}</ThemedText>
+      <ThemedText>Quantidade: {item.quantidade}</ThemedText>
+    </View>
+  );
+
+  // Função para renderizar produtos disponíveis no estoque
+  const renderProdutos = ({ item }: { item: IEstoque_view }) => (
+    <View style={styles.productItem}>
+      <ThemedText>Nome: {item.nome}</ThemedText>
+      <ThemedText>Preço: {item.preco}</ThemedText>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => {
+          if (selectedComanda) {
+            salvarProdutos({
+              comanda: selectedComanda.id,
+              produto: [
+                {
+                  id: item.id,
+                  quantidade: 1,
+                  tipo: "Adicionar",
+                },
+              ],
+            });
+            setModalProdutoVisible(false); 
+          }
+        }}
+      >
+        <ThemedText>Adicionar</ThemedText>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <ParallaxScrollView
-    headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
-    headerImage={
-      <Ionicons size={310} name="code-slash" style={styles.headerImage} />
-    }
-  >
-    <ThemedView style={styles.titleContainer}>
-      <ThemedText type="title">
-        {comandas ? "Lista de Comandas" : "Nenhuma comanda disponível"}
-      </ThemedText>
-    </ThemedView>
-
-    {/* Exibe a lista de comandas */}
-    {comandas && (
-      <FlatList
-        data={comandas.rows}
-        renderItem={renderComanda}
-        keyExtractor={(item) => item.id.toString()}
-      />
-    )}
-
-    {/* Modal para mostrar os detalhes da comanda */}
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={modalVisible}
-      onRequestClose={() => setModalVisible(false)}
+      headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
+      headerImage={<Ionicons size={310} name="code-slash" style={styles.headerImage} />}
     >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          {selectedComanda ? (
-            <>
-              <ThemedText style={styles.title}>Detalhes da Comanda</ThemedText>
-              <ThemedText>ID: {selectedComanda.id}</ThemedText>
-              <ThemedText>Cliente: {selectedComanda.cliente}</ThemedText>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">
+          {comandas ? "Lista de Comandas" : "Nenhuma comanda disponível"}
+        </ThemedText>
+      </ThemedView>
 
-              <ThemedText style={styles.title}>Produtos:</ThemedText>
+      {/* Exibe a lista de comandas */}
+      {comandas && (
+        <FlatList
+          data={comandas.rows}
+          renderItem={renderComanda}
+          keyExtractor={(item) => item.id.toString()}
+        />
+      )}
 
-              {/* Checando se produtosComanda existe antes de renderizar */}
-              {produtosComanda && produtosComanda.rows.length > 0 ? (
-                <FlatList
-                  data={produtosComanda.rows}
-                  renderItem={renderProduto}
-                  keyExtractor={(item) => item.id.toString()}
-                />
-              ) : (
-                <ThemedText>Sem produtos disponíveis.</ThemedText>
-              )}
-            </>
-          ) : (
-            <ThemedText>
-              Selecione uma comanda para ver os detalhes.
-            </ThemedText>
-          )}
+      {/* Modal para mostrar os detalhes da comanda */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            {selectedComanda ? (
+              <>
+                <ThemedText style={styles.title}>Detalhes da Comanda</ThemedText>
+                <ThemedText>ID: {selectedComanda.id}</ThemedText>
+                <ThemedText>Cliente: {selectedComanda.cliente}</ThemedText>
+                <ThemedText style={styles.title}>Produtos:</ThemedText>
 
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => setModalVisible(false)}
-          >
-            <ThemedText type="default">Fechar</ThemedText>
-          </TouchableOpacity>
+                {/* Renderiza os produtos da comanda */}
+                {produtosComanda && produtosComanda.rows.length > 0 ? (
+                  <FlatList
+                    data={produtosComanda.rows}
+                    renderItem={renderProduto}
+                    keyExtractor={(item) => item.id.toString()}
+                  />
+                ) : (
+                  <ThemedText>Sem produtos disponíveis.</ThemedText>
+                )}
+
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={abrirModalProdutos} 
+                >
+                  <ThemedText type="default">Adicionar produto</ThemedText>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <ThemedText type="default">Fechar</ThemedText>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <ThemedText>Selecione uma comanda para ver os detalhes.</ThemedText>
+            )}
+          </View>
         </View>
-      </View>
-    </Modal>
-  </ParallaxScrollView>
+      </Modal>
+
+      {/* Modal para adicionar produtos à comanda */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalProdutoVisible}
+        onRequestClose={() => setModalProdutoVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            {produtos ? (
+              <>
+                <ThemedText style={styles.title}>Produtos Disponíveis</ThemedText>
+
+                {/* Renderiza os produtos do estoque */}
+                {produtos.rows.length > 0 ? (
+                  <FlatList
+                    data={produtos.rows}
+                    renderItem={renderProdutos}
+                    keyExtractor={(item) => item.id.toString()}
+                  />
+                ) : (
+                  <ThemedText>Sem produtos disponíveis.</ThemedText>
+                )}
+              </>
+            ) : (
+              <ThemedText>Problemas ao carregar os produtos.</ThemedText>
+            )}
+
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalProdutoVisible(false)}
+            >
+              <ThemedText type="default">Fechar</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </ParallaxScrollView>
   );
 };
 
@@ -188,7 +308,7 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: "#007BFF", // Cor do botão
+    backgroundColor: "#007BFF", 
     borderRadius: 5,
     alignItems: "center",
   },
@@ -196,7 +316,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fundo semi-transparente
+    backgroundColor: "rgba(0, 0, 0, 0.5)", 
   },
   modalContent: {
     width: "80%",
@@ -212,7 +332,14 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: "#FF6347", // Cor do botão de fechar
+    backgroundColor: "#FF6347", 
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  saveButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#63FF47", 
     borderRadius: 5,
     alignItems: "center",
   },
@@ -220,6 +347,13 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
+  },
+  addButton: {
+    padding: 10,
+    backgroundColor: "#63FF47",
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 10,
   },
 });
 
