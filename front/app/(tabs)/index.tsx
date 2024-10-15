@@ -27,6 +27,7 @@ import {
   IEstoque_view,
   IApiResponseProdutos,
 } from "@/services/api/Estoque/EstoqueService";
+import { TextInput } from "@react-native-material/core";
 
 const HomeScreen = () => {
   const [comandas, setComanda] = useState<IApiResponse | null>(null);
@@ -36,7 +37,8 @@ const HomeScreen = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalProdutoVisible, setModalProdutoVisible] = useState(false);
-
+  const [modalAdicionarVisible, setModalAdicionarVisible] = useState(false); // Novo estado para modal de adicionar comanda
+  const [novoCliente, setNovoCliente] = useState("");
   // Consultar comandas disponíveis
   const consultarComanda = async () => {
     try {
@@ -113,6 +115,34 @@ const HomeScreen = () => {
     }
   };
 
+  const newComanda = async (dados: ComandaCreate) => {
+    try {
+      const save = await ComandaService.create(dados);
+      if (save instanceof Error) {
+        console.error("Erro ao salvar uma nova comanda.");
+      } else {
+        console.log("Nova comanda criada com sucesso:", save);
+        consultarComanda(); // Atualizar a lista de comandas
+      }
+    } catch (error) {
+      console.error("Erro ao salvar uma nova comanda:", error);
+    }
+  }
+
+  const abrirModalAdicionar = () => {
+    setNovoCliente("");
+    setModalAdicionarVisible(true);
+  };
+
+  const salvarNovaComanda = () => {
+    if (novoCliente.trim()) {
+      newComanda({ cliente: novoCliente });
+      setModalAdicionarVisible(false);
+    } else {
+      alert("Por favor, insira o nome do cliente.");
+    }
+  };
+
   useEffect(() => {
     consultarComanda();
   }, []);
@@ -144,6 +174,7 @@ const HomeScreen = () => {
       </TouchableOpacity>
     </View>
   );
+  
 
   // Função para renderizar produtos da comanda
   const renderProduto = ({ item }: { item: Produto }) => (
@@ -203,21 +234,6 @@ const HomeScreen = () => {
     </View>
   );
 
-  // Função para adicionar uma nova comanda
-  const newComanda = async(dados: ComandaCreate) => {
-     try {
-      const save = await ComandaService.create(dados)
-      if (save instanceof Error) {
-        console.error("Erro ao salvar uma nova comanda.");
-      } else {
-        console.log("Nova comanda criada com sucesso:", save);
-      }
-    } catch (error) {
-      console.error("Erro ao salvar uma nova comanda:", error);
-
-    }
-  }
-
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
@@ -228,6 +244,10 @@ const HomeScreen = () => {
           {comandas ? "Lista de Comandas" : "Nenhuma comanda disponível"}
         </ThemedText>
       </ThemedView>
+
+      <TouchableOpacity style={styles.addButton} onPress={abrirModalAdicionar}>
+        <ThemedText type="default">Adicionar Comanda</ThemedText>
+      </TouchableOpacity>
 
       {/* Exibe a lista de comandas */}
       {comandas && (
@@ -323,6 +343,35 @@ const HomeScreen = () => {
           </View>
         </View>
       </Modal>
+
+            {/* Modal para adicionar nova comanda */}
+            <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalAdicionarVisible}
+        onRequestClose={() => setModalAdicionarVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <ThemedText style={styles.title}>Adicionar Nova Comanda</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Nome do Cliente"
+              value={novoCliente}
+              onChangeText={setNovoCliente}
+            />
+            <TouchableOpacity style={styles.saveButton} onPress={salvarNovaComanda}>
+              <ThemedText type="default">Salvar</ThemedText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalAdicionarVisible(false)}
+            >
+              <ThemedText type="default">Cancelar</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ParallaxScrollView>
   );
 };
@@ -392,6 +441,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     marginTop: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    marginVertical: 10,
+    borderRadius: 5,
+    width: "100%",
   },
 });
 

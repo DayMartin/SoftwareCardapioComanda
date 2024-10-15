@@ -69,11 +69,9 @@ const getByID = async (id: number): Promise<IComanda | Error> => {
 };
 
 
-const create = async (dados: ComandaCreate): Promise<void | Error> => {
-
-  console.log('dados', dados)
+const create = async (cliente: ComandaCreate): Promise<void | Error> => {
   try {
-    await Api.post<ComandaCreate>('comanda/create', dados);
+    await Api.post<ComandaCreate>('comanda/create', cliente);
 
   } catch (error) {
     throw error;

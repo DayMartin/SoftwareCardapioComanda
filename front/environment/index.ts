@@ -14,5 +14,6 @@ export const Environment = {
     /**
      * Url base de consultado dos dados dessa aplicação
      */
-    URL_BASE: 'http://10.0.2.2:3048/api',
+    // URL_BASE: 'http://10.0.2.2:3048/api',
+    URL_BASE: 'http://localhost:3048/api',
   };
