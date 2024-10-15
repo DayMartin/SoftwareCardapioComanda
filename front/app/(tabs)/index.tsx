@@ -171,11 +171,33 @@ const HomeScreen = () => {
                 },
               ],
             });
+            
             setModalProdutoVisible(false); 
           }
         }}
       >
         <ThemedText>Adicionar</ThemedText>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.closeButton}
+        onPress={() => {
+          if (selectedComanda) {
+            salvarProdutos({
+              comanda: selectedComanda.id,
+              produto: [
+                {
+                  id: item.id,
+                  quantidade: 1,
+                  tipo: "Excluir",
+                },
+              ],
+            });
+            
+            setModalProdutoVisible(false); 
+          }
+        }}
+      >
+        <ThemedText>Excluir</ThemedText>
       </TouchableOpacity>
     </View>
   );
@@ -277,7 +299,7 @@ const HomeScreen = () => {
             )}
 
             <TouchableOpacity
-              style={styles.closeButton}
+              style={styles.button}
               onPress={() => setModalProdutoVisible(false)}
             >
               <ThemedText type="default">Fechar</ThemedText>
